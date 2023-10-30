@@ -1,0 +1,73 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400&family=Raleway:wght@200&family=Urbanist:wght@100&display=swap");
+
+body {
+  background-color: black;
+  font-family: "Montserrat", sans-serif;
+}
+
+h1, label{
+  color: white;
+}
+
+h1{
+    text-align: center;
+}
+
+
+input, select{
+    border: none;
+    background: none;
+    outline: none; 
+    color: white;
+    background-color: #505050;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+}
+
+input{
+    min-width: 60%;
+    max-width: 100%;
+}
+
+select{
+    min-width: 6.5rem;
+
+}
+
+
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+
+.main-container {
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+
+  border: 0.2rem solid #535353;
+  background-color: #303030;
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 23rem;
+}
+
+.vertical-container{
+    display: flex;
+    flex-direction: column;
+}
+
+.horizontal-container{
+    display: flex;
+    justify-content: space-between;
+}
+
+.input-container{
+    margin: 0.5rem 0;
+}

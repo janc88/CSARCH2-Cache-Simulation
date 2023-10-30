@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSARCH2 Cache Simulation</title>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+  </head>
+  <body>
+    <div class="main-container">
+      <h1>Cache Simulator</h1>
+
+      <div class="vertical-container">
+        <div class="input-container">
+          <div class="vertical-container">
+            <label for="blockSize">Block Size:</label>
+            <input
+              type="number"
+              id="blockSize"
+              name="blockSize"
+              placeholder="Enter size"
+            />
+          </div>
+        </div>
+
+        <div class="input-container">
+          <label for="mainMemorySize">Main Memory Size:</label>
+          <div class="horizontal-container">
+            <input
+              type="number"
+              id="mainMemorySize"
+              name="mainMemorySize"
+              placeholder="Enter size"
+            />
+            <select name="mainMemorySizeUnit">
+              <option value="blocks">Blocks</option>
+              <option value="words">Words</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <label for="cacheMemorySize">Cache Memory Size:</label>
+          <div class="horizontal-container">
+            <input
+              type="number"
+              id="cacheMemorySize"
+              name="cacheMemorySize"
+              placeholder="Enter size"
+            />
+            <select name="cacheMemorySizeUnit">
+              <option value="blocks">Blocks</option>
+              <option value="words">Words</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <div class="vertical-container">
+            <label for="cacheAccessTime">Cache Access Time:</label>
+            <input
+              type="number"
+              id="cacheAccessTime"
+              name="cacheAccessTime"
+              placeholder="Enter time (in nanoseconds)"
+            />
+          </div>
+        </div>
+
+        <div class="input-container">
+          <div class="vertical-container">
+            <label for="memoryAccessTime">Memory Access Time:</label>
+            <input
+              type="number"
+              id="memoryAccessTime"
+              name="memoryAccessTime"
+              placeholder="Enter time (in nanoseconds)"
+            />
+          </div>
+        </div>
+
+        <div class="input-container">
+          <label for="fetchSequence">Fetch Sequence:</label>
+          <div class="horizontal-container">
+            <input
+              type="text"
+              id="fetchSequence"
+              name="fetchSequence"
+              placeholder="Enter sequence"
+            />
+            <select name="fetchSequenceUnit">
+              <option value="blocks">Blocks</option>
+              <option value="addresses">Addresses</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="input-container">
+            <div class="vertical-container">
+              <label for="numFetch">Number of times fetched:</label>
+              <input
+                type="number"
+                id="numFetch"
+                name="numFetch"
+                placeholder="Enter number"
+              />
+            </div>
+          </div>
+
+      </div>
+    </div>
+  </body>
+</html>
