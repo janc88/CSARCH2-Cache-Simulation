@@ -5,7 +5,7 @@ body {
   font-family: "Montserrat", sans-serif;
 }
 
-h1, label{
+h1, h4, label{
   color: white;
 }
 
@@ -14,7 +14,21 @@ h1{
 }
 
 
-input, select{
+h4{
+    margin-bottom: 0.2rem;
+    margin-top: 0;
+}
+
+.error-text{
+    visibility: hidden;
+    margin-top: 0.3rem;
+    margin-bottom: 0;
+    color: red;
+}
+
+
+
+input, select, button{
     border: none;
     background: none;
     outline: none; 
@@ -24,6 +38,16 @@ input, select{
     padding: 0.5rem;
 }
 
+button{
+    width: 7rem;
+    margin: 0 auto;
+    padding: 0.8rem;
+    margin-top: 0.5rem;
+    background-color: green;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
 input{
     min-width: 60%;
     max-width: 100%;
@@ -31,7 +55,6 @@ input{
 
 select{
     min-width: 6.5rem;
-
 }
 
 
