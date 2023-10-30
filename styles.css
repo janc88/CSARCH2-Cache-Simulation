@@ -5,69 +5,73 @@ body {
   font-family: "Montserrat", sans-serif;
 }
 
-h1, h4, label{
+h1,
+h4,
+label {
   color: white;
 }
 
-h1{
-    text-align: center;
+h1 {
+  text-align: center;
+  margin: 0.5rem;
 }
 
-
-h4{
-    margin-bottom: 0.2rem;
-    margin-top: 0;
+h4 {
+  margin-bottom: 0.2rem;
+  margin-top: 0;
 }
 
-.error-text{
-    visibility: hidden;
-    margin-top: 0.3rem;
-    margin-bottom: 0;
-    color: red;
+.error-text {
+  visibility: hidden;
+  margin-top: 0.3rem;
+  margin-bottom: 0;
+  color: red;
 }
 
-
-
-input, select, button{
-    border: none;
-    background: none;
-    outline: none; 
-    color: white;
-    background-color: #505050;
-    border-radius: 0.5rem;
-    padding: 0.5rem;
+input,
+select,
+button {
+  border: none;
+  background: none;
+  outline: none;
+  color: white;
+  background-color: #505050;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
 }
 
-button{
-    width: 7rem;
-    margin: 0 auto;
-    padding: 0.8rem;
-    margin-top: 0.5rem;
-    background-color: green;
-    font-weight: bold;
-    font-size: 1rem;
+button {
+  width: 9rem;
+  padding: 0.8rem;
+  margin-top: 0.5rem;
+  font-weight: bold;
+  font-size: 1rem;
 }
 
-input{
-    min-width: 60%;
-    max-width: 100%;
+#simulate-button {
+  background-color: green;
 }
 
-select{
-    min-width: 6.5rem;
+#clear-button {
+  background-color: gray;
 }
 
+input {
+  min-width: 60%;
+  max-width: 100%;
+}
 
+select {
+  min-width: 6.5rem;
+}
 
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-
 .main-container {
-
   position: absolute;
   left: 50%;
   top: 50%;
@@ -78,19 +82,23 @@ input[type="number"]::-webkit-outer-spin-button {
   background-color: #303030;
   padding: 2rem;
   border-radius: 1rem;
-  width: 23rem;
+  min-width: 23rem;
 }
 
-.vertical-container{
-    display: flex;
-    flex-direction: column;
+.vertical-container,
+.inputs-container {
+  display: flex;
+  flex-direction: column;
 }
 
-.horizontal-container{
-    display: flex;
-    justify-content: space-between;
+.inputs-container {
 }
 
-.input-container{
-    margin: 0.5rem 0;
+.horizontal-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.input-container {
+  margin: 0.5rem 0;
 }

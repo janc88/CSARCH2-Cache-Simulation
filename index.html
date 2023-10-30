@@ -9,16 +9,18 @@
   </head>
   <body>
     <div class="main-container">
-      <h1>Cache Simulator</h1>
+      <h1>Full-Associative</h1>
+      <h1>First-In-First-Out</h1>
+      <h1 style="margin-bottom: 1rem;">Cache Simulator</h1>
 
-      <div class="vertical-container">
+      <div class="inputs-container">
         <div class="input-container">
           <div class="vertical-container">
             <h4>Block Size:</h4>
             <input
               type="number"
               id="blockSize"
-              placeholder="Enter size"
+              placeholder="Enter number of words in a block"
             />
           </div>
           <h5 id="blockSizeError" class="error-text">This field is required</h5>
@@ -98,7 +100,7 @@
 
         <div class="input-container">
           <div class="vertical-container">
-            <h4>Number of times fetched:</h4>
+            <h4>Number of times to be fetched:</h4>
             <input
               type="number"
               id="numFetch"
@@ -107,10 +109,12 @@
           </div>
           <h5 id="numFetchError" class="error-text">This field is required</h5>
         </div>
-
-        <button id="simulate-button">Simulate</button>
-        <script src="script.js"></script>
       </div>
+      <div class="horizontal-container">
+        <button id="clear-button">Clear</button>
+        <button id="simulate-button">Simulate</button>
+      </div>
+      <script src="script.js"></script>
     </div>
   </body>
 </html>
