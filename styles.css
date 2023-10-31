@@ -7,7 +7,9 @@ body {
 
 h1,
 h4,
-label {
+h2,
+label,
+table {
   color: white;
 }
 
@@ -16,7 +18,8 @@ h1 {
   margin: 0.5rem;
 }
 
-h4 {
+h4,
+h2 {
   margin-bottom: 0.2rem;
   margin-top: 0;
 }
@@ -26,6 +29,9 @@ h4 {
   margin-top: 0.3rem;
   margin-bottom: 0;
   color: red;
+}
+
+#results {
 }
 
 input,
@@ -72,23 +78,41 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .main-container {
-  position: absolute;
+  /* position: absolute;
   left: 50%;
   top: 50%;
   -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); */
+  justify-content: center;
+
+  display: flex;
+}
+
+.hide {
+  display: none;
+}
+
+.container {
+  max-height: 90vh;
+  overflow-y: auto;
 
   border: 0.2rem solid #535353;
   background-color: #303030;
   padding: 2rem;
   border-radius: 1rem;
   min-width: 23rem;
+  margin: 0 1rem;
 }
 
 .vertical-container,
-.inputs-container {
+.inputs-container,
+.result-container {
   display: flex;
   flex-direction: column;
+}
+
+.result-container {
+  margin: 1rem 0;
 }
 
 .inputs-container {

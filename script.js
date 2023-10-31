@@ -39,6 +39,8 @@ $(document).ready(function () {
   });
 
   $("#simulate-button").click(function () {
+    $("#snapshot").empty();
+
     var cacheBlocks;
 
     var blockSize = showErrorIfBlank($("#blockSize"), $("#blockSizeError"));
@@ -106,23 +108,21 @@ $(document).ready(function () {
       fetchSequence !== null &&
       numFetch !== null
     ) {
-      //   console.log("Block Size:", blockSize);
-      //   console.log("Main Memory Size:", mainMemorySize, mainMemorySizeUnit);
-      //   console.log("Cache Memory Size:", cacheMemorySize, cacheMemorySizeUnit);
-      //   console.log("Cache Access Time:", cacheAccessTime);
-      //   console.log("Memory Access Time:", memoryAccessTime);
-      //   console.log("Fetch Sequence:", fetchSequence, fetchSequenceUnit);
-      //   console.log("Number of times fetched:", numFetch);
+      $("#results").removeClass("hide");
 
-      var cache = Array(cacheBlocks).fill(-1);
+      var snapshots = [];
+
+      var cache = Array(cacheBlocks).fill("_");
       var index = 0;
       var queue = [];
       var hits = 0;
       var misses = 0;
 
+      snapshots.push(cache.slice());
+
       for (i = 0; i < numFetch; i++) {
         fetchSequence.forEach(function (element, idx) {
-          var emptyCount = cache.filter((value) => value === -1).length;
+          var emptyCount = cache.filter((value) => value === "_").length;
 
           // if element is not in the cache
           if (!cache.includes(element)) {
@@ -140,9 +140,12 @@ $(document).ready(function () {
           } else {
             hits++;
           }
-          console.log(cache);
+          console.log(cache)
+          snapshots.push(cache.slice());
         });
       }
+
+    //   console.log(snapshots)
 
       var memoryAccessCount = hits + misses;
       var hitRate = hits / memoryAccessCount;
@@ -155,14 +158,33 @@ $(document).ready(function () {
         hits * blockSize * cacheAccessTime +
         misses * (cacheAccessTime + blockSize * memoryAccessTime);
 
-      console.log("Hits:", hits);
-      console.log("Misses:", misses);
-      console.log("Memory Access Count:", memoryAccessCount);
-      console.log("Hit Rate:", hitRate);
-      console.log("Miss Rate:", missRate);
-      console.log("Miss Penalty:", missPenalty);
-      console.log("Average Access Time:", averageAccessTime);
-      console.log("Total Access Time:", totalAccessTime);
+      $("#hits").text(hits);
+      $("#misses").text(misses);
+      $("#hitRate").text(hitRate.toFixed(2));
+      $("#missRate").text(missRate.toFixed(2));
+      $("#memoryAccessCount").text(memoryAccessCount);
+      $("#missPenalty").text(missPenalty.toFixed(2) + "ns");
+      $("#averageAccessTime").text(averageAccessTime.toFixed(2) + "ns");
+      $("#totalAccessTime").text(totalAccessTime + "ns");
+
+
+
+      var $snapshotDiv = $("#snapshot");
+
+      var $table = $("<table>").addClass("snapshot-table");
+
+      snapshots.forEach(function (row) {
+        var $row = $("<tr>");
+
+        row.forEach(function (cellData) {
+          var $cell = $("<td>").text(cellData);
+          $row.append($cell);
+        });
+
+        $table.append($row);
+      });
+
+      $snapshotDiv.append($table);
     }
   });
 });
