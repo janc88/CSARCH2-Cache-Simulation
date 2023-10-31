@@ -64,7 +64,8 @@ $(document).ready(function () {
     if (cacheMemorySizeUnit == "blocks") {
       cacheBlocks = parseInt(cacheMemorySize);
     } else {
-      cacheBlocks = parseInt(cacheMemorySize) / blockSize;
+      // TODO: not sure if we should floor or if we should check if the cache memory size is a multiple of the block size
+      cacheBlocks = Math.floor(parseInt(cacheMemorySize) / blockSize);
     }
 
     var fetchSequenceInput = $("#fetchSequence");
@@ -78,6 +79,11 @@ $(document).ready(function () {
       : null;
 
     var fetchSequenceUnit = $("select[name=fetchSequenceUnit]").val();
+
+    if (fetchSequenceUnit == "words") {
+      //TODO: not implemented yet.
+    }
+
     var numFetch = showErrorIfBlank($("#numFetch"), $("#numFetchError"));
 
     if (fetchSequence !== null) {
@@ -118,6 +124,7 @@ $(document).ready(function () {
         fetchSequence.forEach(function (element, idx) {
           var emptyCount = cache.filter((value) => value === -1).length;
 
+          // if element is not in the cache
           if (!cache.includes(element)) {
             // there is still space in the cache
             if (emptyCount != 0) {
@@ -129,6 +136,7 @@ $(document).ready(function () {
             }
             queue.push(element);
             misses++;
+            // if element is in the cache
           } else {
             hits++;
           }

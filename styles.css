@@ -57,12 +57,12 @@ button {
 }
 
 input {
-  min-width: 60%;
+  min-width: 70%;
   max-width: 100%;
 }
 
 select {
-  min-width: 6.5rem;
+  min-width: 5rem;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
