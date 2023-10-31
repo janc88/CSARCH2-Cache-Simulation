@@ -62,6 +62,10 @@ button {
   background-color: gray;
 }
 
+#download-button {
+  background-color: cornflowerblue;
+}
+
 input {
   min-width: 70%;
   max-width: 100%;

@@ -1,3 +1,16 @@
+var snapshots = [];
+var cacheBlocks;
+var blockSize;
+var mainMemorySize;
+var mainMemorySizeUnit;
+var cacheMemorySize;
+var cacheMemorySizeUnit;
+var cacheAccessTime;
+var memoryAccessTime;
+var fetchSequence;
+var fetchSequenceUnit;
+var numFetch;
+
 $(document).ready(function () {
   function showErrorIfBlank(inputField, errorElement) {
     if (inputField.val() === "") {
@@ -41,24 +54,22 @@ $(document).ready(function () {
   $("#simulate-button").click(function () {
     $("#snapshot").empty();
 
-    var cacheBlocks;
-
-    var blockSize = showErrorIfBlank($("#blockSize"), $("#blockSizeError"));
-    var mainMemorySize = showErrorIfBlank(
+    blockSize = showErrorIfBlank($("#blockSize"), $("#blockSizeError"));
+    mainMemorySize = showErrorIfBlank(
       $("#mainMemorySize"),
       $("#mainMemorySizeError")
     );
-    var mainMemorySizeUnit = $("select[name=mainMemorySizeUnit]").val();
-    var cacheMemorySize = showErrorIfBlank(
+    mainMemorySizeUnit = $("select[name=mainMemorySizeUnit]").val();
+    cacheMemorySize = showErrorIfBlank(
       $("#cacheMemorySize"),
       $("#cacheMemorySizeError")
     );
-    var cacheMemorySizeUnit = $("select[name=cacheMemorySizeUnit]").val();
-    var cacheAccessTime = showErrorIfBlank(
+    cacheMemorySizeUnit = $("select[name=cacheMemorySizeUnit]").val();
+    cacheAccessTime = showErrorIfBlank(
       $("#cacheAccessTime"),
       $("#cacheAccessTimeError")
     );
-    var memoryAccessTime = showErrorIfBlank(
+    memoryAccessTime = showErrorIfBlank(
       $("#memoryAccessTime"),
       $("#memoryAccessTimeError")
     );
@@ -76,17 +87,17 @@ $(document).ready(function () {
       fetchSequenceInput,
       fetchSequenceError
     );
-    var fetchSequence = fetchSequenceValue
+    fetchSequence = fetchSequenceValue
       ? fetchSequenceValue.split(",").map((item) => item.trim())
       : null;
 
-    var fetchSequenceUnit = $("select[name=fetchSequenceUnit]").val();
+    fetchSequenceUnit = $("select[name=fetchSequenceUnit]").val();
 
     if (fetchSequenceUnit == "words") {
       //TODO: not implemented yet.
     }
 
-    var numFetch = showErrorIfBlank($("#numFetch"), $("#numFetchError"));
+    numFetch = showErrorIfBlank($("#numFetch"), $("#numFetchError"));
 
     if (fetchSequence !== null) {
       const isValidSequence = fetchSequence.every(
@@ -109,8 +120,6 @@ $(document).ready(function () {
       numFetch !== null
     ) {
       $("#results").removeClass("hide");
-
-      var snapshots = [];
 
       var cache = Array(cacheBlocks).fill("_");
       var index = 0;
@@ -140,12 +149,12 @@ $(document).ready(function () {
           } else {
             hits++;
           }
-          console.log(cache)
+          console.log(cache);
           snapshots.push(cache.slice());
         });
       }
 
-    //   console.log(snapshots)
+      //   console.log(snapshots)
 
       var memoryAccessCount = hits + misses;
       var hitRate = hits / memoryAccessCount;
@@ -167,8 +176,6 @@ $(document).ready(function () {
       $("#averageAccessTime").text(averageAccessTime.toFixed(2) + "ns");
       $("#totalAccessTime").text(totalAccessTime + "ns");
 
-
-
       var $snapshotDiv = $("#snapshot");
 
       var $table = $("<table>").addClass("snapshot-table");
@@ -186,5 +193,21 @@ $(document).ready(function () {
 
       $snapshotDiv.append($table);
     }
+  });
+
+  $("#download-button").click(function () {
+    var snapshotsText = snapshots.map((row) => row.join(" ")).join("\n");
+    var blob = new Blob([snapshotsText], { type: "text/plain" });
+    var url = URL.createObjectURL(blob);
+
+    var a = $("<a>")
+      .attr("href", url)
+      .attr("download", "snapshots.txt")
+      .appendTo("body")
+      .css("display", "none");
+
+    a[0].click();
+    a.remove();
+    URL.revokeObjectURL(url);
   });
 });
