@@ -3,7 +3,7 @@ var cacheBlocks;
 var blockSize;
 var mainMemoryBlocks;
 var mainMemorySizeUnit;
-var cacheMemoryBlocks;
+var cacheBlocks;
 var cacheMemorySizeUnit;
 var cacheAccessTime;
 var memoryAccessTime;
@@ -85,29 +85,29 @@ $(document).ready(function () {
 	if (isNaN(mainMemoryBlocks))
 		mainMemoryBlocks = null;
 
-    cacheMemoryBlocks = showErrorIfBlank(
+    cacheBlocks = showErrorIfBlank(
       $("#cacheMemorySize"),
       $("#cacheMemorySizeError")
     );
     cacheMemorySizeUnit = $("select[name=cacheMemorySizeUnit]").val();
-	cacheMemoryBlocks = parseInt(cacheMemoryBlocks);
+	cacheBlocks = parseInt(cacheBlocks);
 	if (cacheMemorySizeUnit == "words") {
-		if (cacheMemoryBlocks % blockSize !== 0) {
+		if (cacheBlocks % blockSize !== 0) {
 			showError($("#cacheMemorySizeError"), "Cache memory size must be a multiple of the block size");
-			cacheMemoryBlocks = null;
+			cacheBlocks = null;
 		} else {
-			cacheMemoryBlocks = Math.floor(cacheMemoryBlocks / blockSize);
+			cacheBlocks = Math.floor(cacheBlocks / blockSize);
 			cacheMemorySizeUnit = "blocks";
 		}
 	}
-	if (cacheMemoryBlocks <= 0) {
+	if (cacheBlocks <= 0) {
 		showError($("#cacheMemorySizeError"), "Cache memory size must be greater than 0");
-		cacheMemoryBlocks = null;
+		cacheBlocks = null;
 	}
-	if (isNaN(cacheMemoryBlocks))
-		cacheMemoryBlocks = null;
+	if (isNaN(cacheBlocks))
+		cacheBlocks = null;
 
-	if (mainMemoryBlocks < cacheMemoryBlocks)
+	if (mainMemoryBlocks < cacheBlocks)
 		showError($("#mainMemorySizeError"), "Main memory size must be greater than or equal to cache memory size");
 
     cacheAccessTime = showErrorIfBlank(
@@ -132,13 +132,14 @@ $(document).ready(function () {
 	if (isNaN(memoryAccessTime)) memoryAccessTime = null;
 
     var fetchSequenceInput = $("#fetchSequence");
+	fetchSequenceInput.val(fetchSequenceInput.val().replaceAll(/[^\d]+/g, ' ').trim())
     var fetchSequenceError = $("#fetchSequenceError");
     var fetchSequenceValue = showErrorIfBlank(
       fetchSequenceInput,
       fetchSequenceError
     );
     fetchSequence = fetchSequenceValue === null ? null :
-		fetchSequenceValue.replaceAll(/[^\d]+/g, ' ').trim().split(" ").map((item) => parseInt(item))
+		fetchSequenceValue.split(" ").map((item) => parseInt(item))
 
     fetchSequenceUnit = $("select[name=fetchSequenceUnit]").val();
 
@@ -153,18 +154,23 @@ $(document).ready(function () {
     if (fetchSequence !== null) {
 	  let max = mainMemoryBlocks
 	  if (fetchSequenceUnit == "words") max *= blockSize;
-      const isValidSequence = fetchSequence.every(
-        (item) => !isNaN(item) && item >= 0 && item < max
-      );
-      if (!isValidSequence) {
-        showError(fetchSequenceError, "Invalid sequence");
-        fetchSequence = null;
-      }
+	  for (const val of fetchSequence) {
+		if (isNaN(val))
+			showError(fetchSequenceError, "Invalid sequence");
+		else if (val >= max)
+			showError(fetchSequenceError, `Cannot fetch ${val} from main memory`);
+		else if (val < 0)
+			showError(fetchSequenceError, `Cannot fetch negative address ${val}`);
+		else
+			continue;
+		fetchSequence = null;
+		break;
+	  }
     }
 	return (
 		blockSize !== null &&
 		mainMemoryBlocks !== null &&
-		cacheMemoryBlocks !== null &&
+		cacheBlocks !== null &&
 		cacheAccessTime !== null &&
 		memoryAccessTime !== null &&
 		fetchSequence !== null &&
@@ -175,39 +181,27 @@ $(document).ready(function () {
     $("#snapshot").empty();
 	if (!getValues()) return;
 
-	$("#results").removeClass("hide");
-
     if (fetchSequenceUnit == "words") {
       //TODO: not implemented yet.
+	  return
     }
 
 	var cache = Array(cacheBlocks).fill("_");
 	var index = 0;
-	var queue = [];
 	var hits = 0;
 	var misses = 0;
+	snapshots = [cache.slice()];
+	console.log(cache);
 
-	snapshots.push(cache.slice());
-
-	for (i = 0; i < numFetch; i++) {
-	  fetchSequence.forEach(function (element, idx) {
-		var emptyCount = cache.filter((value) => value === "_").length;
-
+	for (let i = 0; i < numFetch; i++) {
+	  fetchSequence.forEach((element) => {
 		// if element is not in the cache
 		if (!cache.includes(element)) {
-		// there is still space in the cache
-		if (emptyCount != 0) {
 			cache[index] = element;
-			index++;
-			// the cache is full
+			index = (index + 1) % cacheBlocks;
+			misses++;
 		} else {
-			cache[cache.indexOf(queue.shift())] = element;
-		}
-		queue.push(element);
-		misses++;
-		// if element is in the cache
-		} else {
-		hits++;
+			hits++;
 		}
 		console.log(cache);
 		snapshots.push(cache.slice());
@@ -220,12 +214,14 @@ $(document).ready(function () {
 	var hitRate = hits / memoryAccessCount;
 	var missRate = misses / memoryAccessCount;
 	var missPenalty =
-	  (1 * memoryAccessTime + blockSize * memoryAccessTime) / 2;
+	  (1 * memoryAccessTime + blockSize * memoryAccessTime) / 2 + cacheAccessTime;
 	var averageAccessTime =
 	  hitRate * cacheAccessTime + missRate * missPenalty;
 	var totalAccessTime =
 	  hits * blockSize * cacheAccessTime +
-	  misses * (cacheAccessTime + blockSize * memoryAccessTime);
+	  misses * (cacheAccessTime + blockSize * (memoryAccessTime + cacheAccessTime));
+
+	$("#results").removeClass("hide");
 
 	$("#hits").text(hits);
 	$("#misses").text(misses);
