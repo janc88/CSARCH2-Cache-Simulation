@@ -61,11 +61,12 @@
       
               <div class="input-container">
                 <div class="vertical-container">
-                  <h4>Cache Access Time:</h4>
+                  <h4>Cache Access Time (ns):</h4>
                   <input
                     type="number"
                     id="cacheAccessTime"
                     placeholder="Enter time (in nanoseconds)"
+					value="1"
                   />
                 </div>
                 <h5 id="cacheAccessTimeError" class="error-text">This field is required</h5>
@@ -73,11 +74,12 @@
       
               <div class "input-container">
                 <div class="vertical-container">
-                  <h4>Memory Access Time:</h4>
+                  <h4>Memory Access Time (ns):</h4>
                   <input
                     type="number"
                     id="memoryAccessTime"
                     placeholder="Enter time (in nanoseconds)"
+					value="10"
                   />
                 </div>
                 <h5 id="memoryAccessTimeError" class="error-text">This field is required</h5>
@@ -89,7 +91,7 @@
                   <input
                     type="text"
                     id="fetchSequence"
-                    placeholder="Enter sequence (comma-separated)"
+                    placeholder="Enter sequence (comma-separated in decimal)"
                   />
                   <select name="fetchSequenceUnit">
                     <option value="blocks">Blocks</option>
@@ -106,6 +108,7 @@
                     type="number"
                     id="numFetch"
                     placeholder="Enter number"
+					value="1"
                   />
                 </div>
                 <h5 id="numFetchError" class="error-text">This field is required</h5>

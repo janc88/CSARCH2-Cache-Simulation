@@ -1,9 +1,9 @@
 var snapshots = [];
 var cacheBlocks;
 var blockSize;
-var mainMemorySize;
+var mainMemoryBlocks;
 var mainMemorySizeUnit;
-var cacheMemorySize;
+var cacheMemoryBlocks;
 var cacheMemorySizeUnit;
 var cacheAccessTime;
 var memoryAccessTime;
@@ -12,13 +12,20 @@ var fetchSequenceUnit;
 var numFetch;
 
 $(document).ready(function () {
+  function showError($el, msg = "This field is required") {
+	$el.css("visibility", "visible");
+	if (msg !== null)
+		$el.text(msg);
+  }
+  function hideError($el) {
+	$el.css("visibility", "hidden");
+  }
   function showErrorIfBlank(inputField, errorElement) {
     if (inputField.val() === "") {
-      errorElement.css("visibility", "visible");
-      errorElement.text("This field is required");
+      showError(errorElement);
       return null;
     } else {
-      errorElement.css("visibility", "hidden");
+      hideError(errorElement)
       return inputField.val();
     }
   }
@@ -26,11 +33,10 @@ $(document).ready(function () {
   function clearErrorOnInput(inputField, errorElement) {
     inputField.on("input", function () {
       if (inputField.val() !== "") {
-        errorElement.css("visibility", "hidden");
+        hideError(errorElement);
       }
     });
   }
-
   clearErrorOnInput($("#blockSize"), $("#blockSizeError"));
   clearErrorOnInput($("#mainMemorySize"), $("#mainMemorySizeError"));
   clearErrorOnInput($("#cacheMemorySize"), $("#cacheMemorySizeError"));
@@ -39,47 +45,91 @@ $(document).ready(function () {
   clearErrorOnInput($("#fetchSequence"), $("#fetchSequenceError"));
   clearErrorOnInput($("#numFetch"), $("#numFetchError"));
 
-  $("#clear-button").click(function () {
+  const clearHandler = () => {
     $("#blockSize").val("");
     $("#mainMemorySize").val("");
     $("#cacheMemorySize").val("");
-    $("#cacheAccessTime").val("");
-    $("#memoryAccessTime").val("");
+    //$("#cacheAccessTime").val("1");
+    //$("#memoryAccessTime").val("10");
     $("#fetchSequence").val("");
-    $("#numFetch").val("");
+    //$("#numFetch").val("1");
 
     $(".error-text").css("visibility", "hidden");
-  });
+  }
+  $("#clear-button").click(clearHandler);
 
-  $("#simulate-button").click(function () {
-    $("#snapshot").empty();
+  function getValues() {
 
     blockSize = showErrorIfBlank($("#blockSize"), $("#blockSizeError"));
-    mainMemorySize = showErrorIfBlank(
+	blockSize = parseInt(blockSize);
+
+    mainMemoryBlocks = showErrorIfBlank(
       $("#mainMemorySize"),
       $("#mainMemorySizeError")
     );
     mainMemorySizeUnit = $("select[name=mainMemorySizeUnit]").val();
-    cacheMemorySize = showErrorIfBlank(
+	mainMemoryBlocks = parseInt(mainMemoryBlocks);
+	if (mainMemorySizeUnit == "words") {
+		if (mainMemoryBlocks % blockSize !== 0) {
+			showError($("#mainMemorySizeError"), "Main memory size must be a multiple of the block size");
+			mainMemoryBlocks = null;
+		} else {
+			mainMemoryBlocks = Math.floor(mainMemoryBlocks / blockSize);
+			mainMemorySizeUnit = "blocks";
+		}
+	}
+	if (mainMemoryBlocks <= 0) {
+		showError($("#mainMemorySizeError"), "Main memory size must be greater than 0");
+		mainMemoryBlocks = null;
+	}
+	if (isNaN(mainMemoryBlocks))
+		mainMemoryBlocks = null;
+
+    cacheMemoryBlocks = showErrorIfBlank(
       $("#cacheMemorySize"),
       $("#cacheMemorySizeError")
     );
     cacheMemorySizeUnit = $("select[name=cacheMemorySizeUnit]").val();
+	cacheMemoryBlocks = parseInt(cacheMemoryBlocks);
+	if (cacheMemorySizeUnit == "words") {
+		if (cacheMemoryBlocks % blockSize !== 0) {
+			showError($("#cacheMemorySizeError"), "Cache memory size must be a multiple of the block size");
+			cacheMemoryBlocks = null;
+		} else {
+			cacheMemoryBlocks = Math.floor(cacheMemoryBlocks / blockSize);
+			cacheMemorySizeUnit = "blocks";
+		}
+	}
+	if (cacheMemoryBlocks <= 0) {
+		showError($("#cacheMemorySizeError"), "Cache memory size must be greater than 0");
+		cacheMemoryBlocks = null;
+	}
+	if (isNaN(cacheMemoryBlocks))
+		cacheMemoryBlocks = null;
+
+	if (mainMemoryBlocks < cacheMemoryBlocks)
+		showError($("#mainMemorySizeError"), "Main memory size must be greater than or equal to cache memory size");
+
     cacheAccessTime = showErrorIfBlank(
       $("#cacheAccessTime"),
       $("#cacheAccessTimeError")
     );
+	cacheAccessTime = parseInt(cacheAccessTime);
+	if (cacheAccessTime <= 0) {
+		showError($("#cacheAccessTimeError"), "Cache access time must be greater than 0");
+		cacheAccessTime = null;
+	}
+	if (isNaN(cacheAccessTime)) cacheAccessTime = null;
     memoryAccessTime = showErrorIfBlank(
       $("#memoryAccessTime"),
       $("#memoryAccessTimeError")
     );
-
-    if (cacheMemorySizeUnit == "blocks") {
-      cacheBlocks = parseInt(cacheMemorySize);
-    } else {
-      // TODO: not sure if we should floor or if we should check if the cache memory size is a multiple of the block size
-      cacheBlocks = Math.floor(parseInt(cacheMemorySize) / blockSize);
-    }
+	memoryAccessTime = parseInt(memoryAccessTime);
+	if (memoryAccessTime <= 0) {
+		showError($("#memoryAccessTimeError"), "Memory access time must be greater than 0");
+		memoryAccessTime = null;
+	}
+	if (isNaN(memoryAccessTime)) memoryAccessTime = null;
 
     var fetchSequenceInput = $("#fetchSequence");
     var fetchSequenceError = $("#fetchSequenceError");
@@ -87,113 +137,122 @@ $(document).ready(function () {
       fetchSequenceInput,
       fetchSequenceError
     );
-    fetchSequence = fetchSequenceValue
-      ? fetchSequenceValue.split(",").map((item) => item.trim())
-      : null;
+    fetchSequence = fetchSequenceValue === null ? null :
+		fetchSequenceValue.replaceAll(/[^\d]+/g, ' ').trim().split(" ").map((item) => parseInt(item))
 
     fetchSequenceUnit = $("select[name=fetchSequenceUnit]").val();
+
+    numFetch = showErrorIfBlank($("#numFetch"), $("#numFetchError"));
+	numFetch = parseInt(numFetch);
+	if (numFetch <= 0) {
+		showError($("#numFetchError"), "Number of fetches must be greater than 0");
+		numFetch = null;
+	}
+	if (isNaN(numFetch)) numFetch = null;
+
+    if (fetchSequence !== null) {
+	  let max = mainMemoryBlocks
+	  if (fetchSequenceUnit == "words") max *= blockSize;
+      const isValidSequence = fetchSequence.every(
+        (item) => !isNaN(item) && item >= 0 && item < max
+      );
+      if (!isValidSequence) {
+        showError(fetchSequenceError, "Invalid sequence");
+        fetchSequence = null;
+      }
+    }
+	return (
+		blockSize !== null &&
+		mainMemoryBlocks !== null &&
+		cacheMemoryBlocks !== null &&
+		cacheAccessTime !== null &&
+		memoryAccessTime !== null &&
+		fetchSequence !== null &&
+		numFetch !== null
+	)
+  }
+  $("#simulate-button").click(function () {
+    $("#snapshot").empty();
+	if (!getValues()) return;
+
+	$("#results").removeClass("hide");
 
     if (fetchSequenceUnit == "words") {
       //TODO: not implemented yet.
     }
 
-    numFetch = showErrorIfBlank($("#numFetch"), $("#numFetchError"));
+	var cache = Array(cacheBlocks).fill("_");
+	var index = 0;
+	var queue = [];
+	var hits = 0;
+	var misses = 0;
 
-    if (fetchSequence !== null) {
-      const isValidSequence = fetchSequence.every(
-        (item) => !isNaN(item) && parseFloat(item) > 0
-      );
-      if (!isValidSequence) {
-        fetchSequenceError.css("visibility", "visible");
-        fetchSequenceError.text("Invalid input");
-        return;
-      }
+	snapshots.push(cache.slice());
+
+	for (i = 0; i < numFetch; i++) {
+	  fetchSequence.forEach(function (element, idx) {
+		var emptyCount = cache.filter((value) => value === "_").length;
+
+		// if element is not in the cache
+		if (!cache.includes(element)) {
+		// there is still space in the cache
+		if (emptyCount != 0) {
+			cache[index] = element;
+			index++;
+			// the cache is full
+		} else {
+			cache[cache.indexOf(queue.shift())] = element;
+		}
+		queue.push(element);
+		misses++;
+		// if element is in the cache
+		} else {
+		hits++;
+		}
+		console.log(cache);
+		snapshots.push(cache.slice());
+      });
     }
-
-    if (
-      blockSize !== null &&
-      mainMemorySize !== null &&
-      cacheMemorySize !== null &&
-      cacheAccessTime !== null &&
-      memoryAccessTime !== null &&
-      fetchSequence !== null &&
-      numFetch !== null
-    ) {
-      $("#results").removeClass("hide");
-
-      var cache = Array(cacheBlocks).fill("_");
-      var index = 0;
-      var queue = [];
-      var hits = 0;
-      var misses = 0;
-
-      snapshots.push(cache.slice());
-
-      for (i = 0; i < numFetch; i++) {
-        fetchSequence.forEach(function (element, idx) {
-          var emptyCount = cache.filter((value) => value === "_").length;
-
-          // if element is not in the cache
-          if (!cache.includes(element)) {
-            // there is still space in the cache
-            if (emptyCount != 0) {
-              cache[index] = element;
-              index++;
-              // the cache is full
-            } else {
-              cache[cache.indexOf(queue.shift())] = element;
-            }
-            queue.push(element);
-            misses++;
-            // if element is in the cache
-          } else {
-            hits++;
-          }
-          console.log(cache);
-          snapshots.push(cache.slice());
-        });
-      }
 
       //   console.log(snapshots)
 
-      var memoryAccessCount = hits + misses;
-      var hitRate = hits / memoryAccessCount;
-      var missRate = misses / memoryAccessCount;
-      var missPenalty =
-        (1 * memoryAccessTime + blockSize * memoryAccessTime) / 2;
-      var averageAccessTime =
-        hitRate * cacheAccessTime + missRate * missPenalty;
-      var totalAccessTime =
-        hits * blockSize * cacheAccessTime +
-        misses * (cacheAccessTime + blockSize * memoryAccessTime);
+	var memoryAccessCount = hits + misses;
+	var hitRate = hits / memoryAccessCount;
+	var missRate = misses / memoryAccessCount;
+	var missPenalty =
+	  (1 * memoryAccessTime + blockSize * memoryAccessTime) / 2;
+	var averageAccessTime =
+	  hitRate * cacheAccessTime + missRate * missPenalty;
+	var totalAccessTime =
+	  hits * blockSize * cacheAccessTime +
+	  misses * (cacheAccessTime + blockSize * memoryAccessTime);
 
-      $("#hits").text(hits);
-      $("#misses").text(misses);
-      $("#hitRate").text(hitRate.toFixed(2));
-      $("#missRate").text(missRate.toFixed(2));
-      $("#memoryAccessCount").text(memoryAccessCount);
-      $("#missPenalty").text(missPenalty.toFixed(2) + "ns");
-      $("#averageAccessTime").text(averageAccessTime.toFixed(2) + "ns");
-      $("#totalAccessTime").text(totalAccessTime + "ns");
+	$("#hits").text(hits);
+	$("#misses").text(misses);
+	$("#hitRate").text(hitRate.toFixed(2));
+	$("#missRate").text(missRate.toFixed(2));
+	$("#memoryAccessCount").text(memoryAccessCount);
+	$("#missPenalty").text(missPenalty.toFixed(2) + "ns");
+	$("#averageAccessTime").text(averageAccessTime.toFixed(2) + "ns");
+	$("#totalAccessTime").text(totalAccessTime + "ns");
 
-      var $snapshotDiv = $("#snapshot");
+	var $snapshotDiv = $("#snapshot");
 
-      var $table = $("<table>").addClass("snapshot-table");
+	var $table = $("<table>").addClass("snapshot-table");
 
-      snapshots.forEach(function (row) {
-        var $row = $("<tr>");
+	snapshots.forEach(function (row) {
+      var $row = $("<tr>");
 
-        row.forEach(function (cellData) {
-          var $cell = $("<td>").text(cellData);
-          $row.append($cell);
-        });
+      row.forEach(function (cellData) {
+      var $cell = $("<td>").text(cellData);
+      $row.append($cell);
+	});
 
-        $table.append($row);
-      });
-
-      $snapshotDiv.append($table);
-    }
+	$table.append($row);
   });
+
+  $snapshotDiv.append($table);
+});
 
   $("#download-button").click(function () {
     var snapshotsText = snapshots.map((row) => row.join(" ")).join("\n");
