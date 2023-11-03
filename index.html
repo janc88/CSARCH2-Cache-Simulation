@@ -15,6 +15,19 @@
             <h1 style="margin-bottom: 1rem;">Cache Simulator</h1>
       
             <div class="inputs-container">
+			  <div class="input-container">
+				<div class="vertical-container">
+				  <h4>Bits per word:</h4>
+				  <input
+					type="number"
+					id="bitsPerWord"
+					placeholder="Enter number of bits per word"
+					value="32"
+				  />
+				</div>
+				<h5 id="bitsPerWordError" class="error-text">This field is required</h5>
+			  </div>
+			  
               <div class="input-container">
                 <div class="vertical-container">
                   <h4>Block Size:</h4>
@@ -22,6 +35,8 @@
                     type="number"
                     id="blockSize"
                     placeholder="Enter number of words in a block"
+					value="2"
+					debug
                   />
                 </div>
                 <h5 id="blockSizeError" class="error-text">This field is required</h5>
@@ -34,6 +49,8 @@
                     type="number"
                     id="mainMemorySize"
                     placeholder="Enter size"
+					value="64"
+					debug
                   />
                   <select name="mainMemorySizeUnit">
                     <option value="blocks">Blocks</option>
@@ -50,6 +67,8 @@
                     type="number"
                     id="cacheMemorySize"
                     placeholder="Enter size"
+					value="8"
+					debug
                   />
                   <select name="cacheMemorySizeUnit">
                     <option value="blocks">Blocks</option>
@@ -92,6 +111,8 @@
                     type="text"
                     id="fetchSequence"
                     placeholder="Enter sequence (comma-separated in decimal)"
+					value="0,1,2,3,4,0,1,2,4,5,3,7,8,9,10,14,15,11,12,13,2,3,4,0"
+					debug
                   />
                   <select name="fetchSequenceUnit">
                     <option value="blocks">Blocks</option>
@@ -173,6 +194,27 @@
 
         </div>
     </div>
-  
+	<div class="main-container">
+		<div class="container hide" id="table-container">
+			<button id="step-button">Step</button>
+			<button id="reset-button">Reset</button>
+			<button id="next-block-button">Next Block</button>
+			<h2 id="table-description"></h2>
+			<table>
+				<thead>
+					<tr>
+						<td>Cache block</td>
+						<td>Valid Bit</td>
+						<td>Tag</td>
+						<td>Data (hex)</td>
+						<td>Address</td>
+					</tr>
+				</thead>
+				<tbody id="table">
+					
+				</tbody>
+			</table>
+		</div>
+	</div>
   </body>
 </html>

@@ -10,8 +10,13 @@ var memoryAccessTime;
 var fetchSequence;
 var fetchSequenceUnit;
 var numFetch;
+var bitsPerWord;
+var tableState;
+var sampleData
 
 $(document).ready(function () {
+  sampleData = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In turpis nisi, scelerisque sit amet elit eu, suscipit pharetra enim. Nam suscipit faucibus suscipit. Mauris consectetur ut arcu eget interdum. Cras facilisis dignissim libero, ac iaculis ex ullamcorper nec. Fusce dapibus, tortor non eleifend commodo, sem nisl blandit eros, vitae volutpat lectus justo id nisi. Vivamus odio sapien, gravida quis arcu in, luctus maximus urna. Phasellus ut ullamcorper dui, nec placerat odio. Vestibulum posuere lorem magna, non vulputate nisl ultrices vitae. Suspendisse tincidunt purus eu turpis eleifend, sit amet dapibus metus imperdiet. Sed vitae erat in augue efficitur mollis. Donec faucibus urna at risus venenatis, sit amet sodales elit molestie. Vivamus mollis, mi sollicitudin cursus dictum, risus justo rhoncus ipsum, sed volutpat libero urna ac risus. Pellentesque ac sem lectus. Cras fringilla elit vel eros tristique sollicitudin.Ut vitae est id sapien euismod dapibus. Vestibulum ut posuere nisl. Vestibulum rutrum odio et nunc aliquet porttitor. Morbi efficitur sed arcu vel bibendum. Praesent arcu risus, tempus ultricies vestibulum non, finibus vel odio. Maecenas at blandit orci. Duis lobortis erat facilisis, iaculis justo quis, ornare enim. Mauris eu nunc blandit, pulvinar mi vel, dictum leo. Etiam blandit in nulla et pulvinar. Curabitur luctus felis purus, nec tempor magna scelerisque nec. Nulla pellentesque justo purus, nec commodo nisi ornare at. Etiam nibh urna, eleifend ut felis a, suscipit tristique nibh. Suspendisse potenti. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ornare varius bibendum. Integer risus metus, laoreet dignissim velit nec, maximus ultrices nibh. Phasellus elementum neque quis mauris hendrerit, non posuere ipsum pulvinar. Pellentesque volutpat nisi sed enim eleifend pharetra. Pellentesque mattis est eget dolor ullamcorper mollis. Aenean nec egestas lorem. In auctor pulvinar maximus. Donec vestibulum massa quis mauris cursus, et viverra purus lacinia. Nullam sit amet massa ut sapien dictum vehicula ut eget leo. Mauris sem ligula, vehicula in dignissim eu, accumsan et nunc. Praesent sed sodales magna. Integer varius nisi eu arcu pharetra consequat. Praesent ultricies malesuada nulla, ac volutpat turpis porta eu. Donec vehicula, mi eu scelerisque tincidunt, orci lacus vulputate dui, vel condimentum erat orci ac ipsum. Aliquam erat volutpat. Integer lectus libero, sagittis vitae interdum vitae, dictum vitae dolor. Sed fermentum, ex in scelerisque faucibus, tortor arcu cursus diam, sed sodales erat tellus quis nibh. Suspendisse auctor sed leo sed consectetur. Proin nec fringilla eros. Ut nisl nunc, congue vitae consequat sit amet, blandit faucibus nisl. Duis gravida tellus nunc, id gravida lorem porttitor id. Proin sodales vel sem eu placerat. Sed feugiat ex eget libero vestibulum auctor. Nulla a tincidunt felis. Sed feugiat facilisis ligula, quis tempus enim congue vitae. Curabitur sollicitudin nulla metus, in porttitor ex maximus a. Donec tincidunt tempus odio in congue. Integer eros est, vehicula vel libero sed, tristique venenatis odio. Integer vehicula eros a dapibus molestie. Etiam blandit ligula velit, in efficitur orci tempus at. Phasellus ac aliquet diam, ut viverra purus. Nulla molestie sem augue, vel ultricies magna mollis a.';
+  sampleData = sampleData.split('').map((c) => c.charCodeAt(0).toString(2).padStart(8, '0')).join('');
   function showError($el, msg = "This field is required") {
 	$el.css("visibility", "visible");
 	if (msg !== null)
@@ -59,6 +64,17 @@ $(document).ready(function () {
   $("#clear-button").click(clearHandler);
 
   function getValues() {
+	bitsPerWord = showErrorIfBlank($("#bitsPerWord"), $("#bitsPerWordError"));
+	bitsPerWord = parseInt(bitsPerWord);
+	if (isNaN(bitsPerWord))
+		bitsPerWord = null;
+	else if (bitsPerWord <= 0) {
+		showError($("#bitsPerWordError"), "Bits per word must be greater than 0");
+		bitsPerWord = null;
+	} else if (Math.log2(bitsPerWord) % 1 !== 0) {
+		showError($("#bitsPerWordError"), "Bits per word must be a power of 2");
+		bitsPerWord = null;
+	}
 
     blockSize = showErrorIfBlank($("#blockSize"), $("#blockSizeError"));
 	blockSize = parseInt(blockSize);
@@ -248,7 +264,100 @@ $(document).ready(function () {
   });
 
   $snapshotDiv.append($table);
+  resetTable();
 });
+
+function toHex(num, digits) {
+	return num.toString(16).padStart(digits, "0");
+}
+function getData(address) {
+	const ind = address * bitsPerWord;
+	return sampleData.slice(ind, ind + bitsPerWord);
+}
+function bitStringToHex(bitString) {
+	let hex = [];
+	bitString = bitString.padStart(Math.ceil(bitString.length / 4) * 4, "0");
+	for (let i = 0; i < bitString.length; i += 4)
+		hex.push(
+			parseInt(bitString.slice(i, i + 4), 2).toString(16)
+		)
+	return hex.join("");
+}
+// for block 
+function generateAccessSequence() {
+	const nextBlock = tableState.sequence[tableState.index++];
+	const operations = [];
+	for (let i = 0; i < blockSize; i++) {
+		const data = getData(nextBlock * blockSize + i);
+		const blockAddress = Math.floor(address / blockSize);
+
+		operations.push({
+			address,
+			data: getData(address),
+			hit: false,
+			miss: false,
+			replace: false,
+		});
+	}
+	return operation;
+}
+function renderTable() {
+	const $results = $("#table");
+	$results.empty();
+	for (const block of tableState.data) {
+		let row = $("<tr>");
+		row.append($("<td>").text(block.block).attr('rowspan', blockSize))
+		row.append($("<td>").text(block.valid).attr('rowspan', blockSize).attr('id', `block-${block.block}-valid`))
+		row.append($("<td>").text(block.tag).attr('rowspan', blockSize).attr('id', `block-${block.block}-tag`))
+		for (let i = 0; i < blockSize; i++) {
+			row.append($("<td>").text(block.data[i]).attr('id', `block-${block.block}-data-${i}`))
+			row.append($("<td>").text(block.address[i]).attr('id', `block-${block.block}-address-${i}`))
+			$results.append(row)
+			row = $("<tr>")
+		}
+	}
+}
+function resetTable() {
+	$('#table-container').removeClass("hide");
+
+	const mmAddressBits = Math.ceil(Math.log2(mainMemoryBlocks * blockSize));
+	const tagBits = mmAddressBits - Math.ceil(Math.log2(blockSize));
+	const dataHex = Math.ceil(Math.log2(bitsPerWord) / 4);
+	tableState = {
+		addressBits: mmAddressBits,
+		tagBits,
+		dataHex,
+		sequenceUnit: fetchSequenceUnit,
+		cacheIndex: 0,
+		index: 0,
+		operations: [],
+		sequence: Array(numFetch).fill(fetchSequence).flat(),
+		data: [],
+		hits: 0,
+		misses: 0,
+		memoryAccessCount: 0,
+		
+		totalAccessTime: 0,
+
+
+		hitPenalty: cacheAccessTime,
+		missPenalty: (1 * memoryAccessTime + blockSize * memoryAccessTime) / 2 + cacheAccessTime,
+		totalHit: blockSize * cacheAccessTime,
+		totalMiss: cacheAccessTime + blockSize * (memoryAccessTime + cacheAccessTime),
+	};
+	// table headers:
+	// Cache block | Valid bit | Tag | Data | MM address
+	for (let cacheBlock = 0; cacheBlock < cacheBlocks; cacheBlock++) {
+		tableState.data.push({
+			valid: '0',
+			block: cacheBlock,
+			tag: '_ (invalid)',
+			data: Array(blockSize).fill('_'.repeat(dataHex)),
+			address: Array(blockSize).fill('_ (invalid)')
+		});
+	}
+	renderTable();
+}
 
   $("#download-button").click(function () {
     var snapshotsText = snapshots.map((row) => row.join(" ")).join("\n");
