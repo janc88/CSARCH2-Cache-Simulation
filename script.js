@@ -288,7 +288,8 @@ function generateAccessSequence() {
 	const nextBlock = tableState.sequence[tableState.sequenceIndex];
 	let cacheLoc = tableState.data.findIndex((block) => block.tag === nextBlock);
 	
-	const cacheTime = tableState.cacheAccessTime;
+	const cacheTime = cacheAccessTime;
+	const memoryTime = memoryAccessTime
 	const operations = [];
 	tableState.operations = operations;
 
@@ -332,16 +333,17 @@ function generateAccessSequence() {
 	});
 	
 	for (let i = 0; i < blockSize; i++) {
-		const data = toHex(getData(nextBlock * blockSize + i), tableState.dataHex);
-		const blockAddress = Math.floor(address / blockSize);
+		const wordAddress = nextBlock * blockSize + i;
+		const data = toHex(getData(wordAddress), tableState.dataHex);
+		const mmBlockAddress = Math.floor(wordAddress / blockSize);
 		const cacheAddress = cacheLoc * blockSize + i;
 		const arr = tableState.data[cacheLoc]
 		operations.push(() => {
-			tableState.desc = `Accessing word ${blockAddress} from main memory (${cacheAddress}); total access time + cache access time + memory access time`
-			tableState.totalAccessTime += cacheTime + memoryAccessTime;
-			arr.accessHistory.push(blockAddress);
+			tableState.desc = `Accessing word ${wordAddress} from main memory block ${mmBlockAddress} (cache ${cacheAddress}); total access time + cache access time + memory access time`
+			tableState.totalAccessTime += cacheTime + memoryTime;
+			arr.accessHistory.push(wordAddress);
 			arr.data[i] = bitStringToHex(data);
-			arr.address[i] = blockAddress;
+			arr.address[i] = wordAddress;
 		});
 	}
 	return;
@@ -377,7 +379,6 @@ function resetTable() {
 	tableState = {
 		// table parameters
 		dataHex,
-		cacheAccessTime,
 		missPenalty: (1 * memoryAccessTime + blockSize * memoryAccessTime) / 2 + cacheAccessTime,
 		sequenceUnit: fetchSequenceUnit,
 		sequence: Array(numFetch).fill(fetchSequence).flat(),
@@ -403,11 +404,20 @@ function resetTable() {
 			tag: '_ (invalid)',
 			data: Array(blockSize).fill('_'.repeat(dataHex)),
 			address: Array(blockSize).fill('_ (invalid)'),
-			accessHistory: []
+			accessHistory: Array(blockSize).fill().map(() => [])
 		});
 	}
 	renderTable();
 }
+$('#table-step-button').click(function() {
+	if (tableState.operations.length === 0) {
+		if (tableState.sequenceIndex >= tableState.sequence.length) 
+			return;
+		generateAccessSequence();
+	}
+	tableState.operations.shift()();
+	renderTable();
+});
 
   $("#download-button").click(function () {
     var snapshotsText = snapshots.map((row) => row.join(" ")).join("\n");
