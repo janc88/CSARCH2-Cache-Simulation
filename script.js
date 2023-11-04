@@ -285,33 +285,86 @@ function bitStringToHex(bitString) {
 }
 // for block 
 function generateAccessSequence() {
-	const nextBlock = tableState.sequence[tableState.index++];
+	const nextBlock = tableState.sequence[tableState.sequenceIndex];
+	let cacheLoc = tableState.data.findIndex((block) => block.tag === nextBlock);
+	
+	const cacheTime = tableState.cacheAccessTime;
 	const operations = [];
-	for (let i = 0; i < blockSize; i++) {
-		const data = getData(nextBlock * blockSize + i);
-		const blockAddress = Math.floor(address / blockSize);
+	tableState.operations = operations;
 
-		operations.push({
-			address,
-			data: getData(address),
-			hit: false,
-			miss: false,
-			replace: false,
+	operations.push(() => {
+		tableState.desc = `Fetching block: ${nextBlock}`
+		tableState.sequenceIndex++;
+	});
+
+	if (cacheLoc !== -1) {
+		operations.push(() => {
+			tableState.desc = `Block ${nextBlock} is already in the cache (${cacheLoc}); hits + 1`
+			tableState.hits++;
+			tableState.averageAccessTime = (
+				tableState.hits * cacheTime + 
+				tableState.misses * tableState.missPenalty
+				) / (tableState.hits + tableState.misses);
+		})
+		for (let i=0; i < blockSize; i++) {
+			const wordAddress = nextBlock * blockSize + i;
+			const cacheAddress = cacheLoc * blockSize + i;
+			operations.push(() => {
+				tableState.desc = `Accessing word ${wordAddress} from cache (${cacheAddress}); total access time + cache access time`
+				tableState.totalAccessTime += cacheTime;
+				tableState.data[cacheLoc].accessHistory.push(wordAddress);
+			});
+		}
+		return;
+	}
+	cacheLoc = tableState.cacheIndex;
+	operations.push(() => {
+		tableState.desc = `Block ${nextBlock} is not in the cache; misses + 1; total + cache access time (for checking)`
+		tableState.misses++;
+		tableState.averageAccessTime = (
+			tableState.hits * cacheTime + 
+			tableState.misses * tableState.missPenalty
+			) / (tableState.hits + tableState.misses);
+		tableState.totalAccessTime += cacheTime;
+		tableState.data[cacheLoc].valid = '1';
+		tableState.data[cacheLoc].tag = nextBlock;
+		tableState.cacheIndex = (cacheLoc + 1) % cacheBlocks;
+	});
+	
+	for (let i = 0; i < blockSize; i++) {
+		const data = toHex(getData(nextBlock * blockSize + i), tableState.dataHex);
+		const blockAddress = Math.floor(address / blockSize);
+		const cacheAddress = cacheLoc * blockSize + i;
+		const arr = tableState.data[cacheLoc]
+		operations.push(() => {
+			tableState.desc = `Accessing word ${blockAddress} from main memory (${cacheAddress}); total access time + cache access time + memory access time`
+			tableState.totalAccessTime += cacheTime + memoryAccessTime;
+			arr.accessHistory.push(blockAddress);
+			arr.data[i] = bitStringToHex(data);
+			arr.address[i] = blockAddress;
 		});
 	}
-	return operation;
+	return;
 }
 function renderTable() {
 	const $results = $("#table");
 	$results.empty();
+	$('#table-hits').text(tableState.hits);
+	$('#table-misses').text(tableState.misses);
+	$('#table-desc').text(tableState.desc);
+	$('#table-totalAccessTime').text(tableState.totalAccessTime);
+	$('#table-averageAccessTime').text(tableState.averageAccessTime);
+	// table headers:
+	// Cache block | Valid bit | Tag | Data | MM address | access history
 	for (const block of tableState.data) {
 		let row = $("<tr>");
 		row.append($("<td>").text(block.block).attr('rowspan', blockSize))
-		row.append($("<td>").text(block.valid).attr('rowspan', blockSize).attr('id', `block-${block.block}-valid`))
-		row.append($("<td>").text(block.tag).attr('rowspan', blockSize).attr('id', `block-${block.block}-tag`))
+		row.append($("<td>").text(block.valid).attr('rowspan', blockSize))
+		row.append($("<td>").text(block.tag).attr('rowspan', blockSize))
 		for (let i = 0; i < blockSize; i++) {
-			row.append($("<td>").text(block.data[i]).attr('id', `block-${block.block}-data-${i}`))
-			row.append($("<td>").text(block.address[i]).attr('id', `block-${block.block}-address-${i}`))
+			row.append($("<td>").text(block.data[i]))
+			row.append($("<td>").text(block.address[i]))
+			row.append($("<td>").text(block.accessHistory[i].join(", ")))
 			$results.append(row)
 			row = $("<tr>")
 		}
@@ -320,40 +373,37 @@ function renderTable() {
 function resetTable() {
 	$('#table-container').removeClass("hide");
 
-	const mmAddressBits = Math.ceil(Math.log2(mainMemoryBlocks * blockSize));
-	const tagBits = mmAddressBits - Math.ceil(Math.log2(blockSize));
 	const dataHex = Math.ceil(Math.log2(bitsPerWord) / 4);
 	tableState = {
-		addressBits: mmAddressBits,
-		tagBits,
+		// table parameters
 		dataHex,
+		cacheAccessTime,
+		missPenalty: (1 * memoryAccessTime + blockSize * memoryAccessTime) / 2 + cacheAccessTime,
 		sequenceUnit: fetchSequenceUnit,
-		cacheIndex: 0,
-		index: 0,
-		operations: [],
 		sequence: Array(numFetch).fill(fetchSequence).flat(),
+		// table state
+		cacheIndex: 0,
+		sequenceIndex: 0,
+		operations: [],
 		data: [],
 		hits: 0,
 		misses: 0,
-		memoryAccessCount: 0,
-		
+
 		totalAccessTime: 0,
+		averageAccessTime: 0,
 
-
-		hitPenalty: cacheAccessTime,
-		missPenalty: (1 * memoryAccessTime + blockSize * memoryAccessTime) / 2 + cacheAccessTime,
-		totalHit: blockSize * cacheAccessTime,
-		totalMiss: cacheAccessTime + blockSize * (memoryAccessTime + cacheAccessTime),
+		desc: ''
 	};
-	// table headers:
-	// Cache block | Valid bit | Tag | Data | MM address
 	for (let cacheBlock = 0; cacheBlock < cacheBlocks; cacheBlock++) {
 		tableState.data.push({
-			valid: '0',
+			// block parameters
 			block: cacheBlock,
+			// block state
+			valid: '0',
 			tag: '_ (invalid)',
 			data: Array(blockSize).fill('_'.repeat(dataHex)),
-			address: Array(blockSize).fill('_ (invalid)')
+			address: Array(blockSize).fill('_ (invalid)'),
+			accessHistory: []
 		});
 	}
 	renderTable();

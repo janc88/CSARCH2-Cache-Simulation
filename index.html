@@ -196,18 +196,23 @@
     </div>
 	<div class="main-container">
 		<div class="container hide" id="table-container">
-			<button id="step-button">Step</button>
-			<button id="reset-button">Reset</button>
-			<button id="next-block-button">Next Block</button>
-			<h2 id="table-description"></h2>
+			<button id="table-step-button">Step</button>
+			<button id="table-reset-button">Reset</button>
+			<button id="table-next-button">Next Block</button>
+			<h2 id="table-hits"></h2>
+			<h2 id="table-misses"></h2>
+			<h2 id="table-desc"></h2>
+			<h2 id="table-averageAccessTime"></h2>
+			<h2 id="table-totalAccessTime"></h2>
 			<table>
 				<thead>
 					<tr>
-						<td>Cache block</td>
-						<td>Valid Bit</td>
-						<td>Tag</td>
+						<td>Cache block (dec)</td>
+						<td>Valid (bit)</td>
+						<td>Tag (dec)</td>
 						<td>Data (hex)</td>
-						<td>Address</td>
+						<td>Address (dec)</td>
+						<td>Access History</td>
 					</tr>
 				</thead>
 				<tbody id="table">
