@@ -453,6 +453,17 @@ $('#table-step-button').click(function() {
 	tableState.operations.shift()();
 	renderTable();
 });
+$('#table-next-button').click(function() {
+	if (tableState.operations.length === 0) {
+		if (tableState.sequenceIndex >= tableState.sequence.length) 
+			return;
+		generateAccessSequence();
+	}
+	while (tableState.operations.length > 0) {
+		tableState.operations.shift()();
+	}
+	renderTable();
+});
 
   $("#download-button").click(function () {
     var snapshotsText = snapshots.map((row) => row.join(" ")).join("\n");

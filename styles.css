@@ -39,6 +39,11 @@ label,
 table {
   color: white;
 }
+table, th, td {
+  border-collapse: collapse;
+  border: 1px solid rgb(255, 255, 255);
+  padding: 0.5rem;
+}
 
 h1 {
   text-align: center;
