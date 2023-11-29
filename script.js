@@ -270,7 +270,7 @@ $(document).ready(function () {
 	  hitRate * cacheAccessTime + missRate * missPenalty;
 	var totalAccessTime =
 	  hits * blockSize * cacheAccessTime +
-	  misses * (cacheAccessTime + blockSize * (memoryAccessTime + cacheAccessTime));
+	  misses * (cacheAccessTime + blockSize * memoryAccessTime);
 
 	$("#results").removeClass("hide");
 
