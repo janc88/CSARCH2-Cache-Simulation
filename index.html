@@ -35,6 +35,7 @@
                     type="number"
                     id="blockSize"
                     placeholder="Enter number of words in a block"
+                    disabled
 					value="2"
 					debug
                   />
@@ -67,12 +68,13 @@
                     type="number"
                     id="cacheMemorySize"
                     placeholder="Enter size"
+                    disabled
 					value="8"
 					debug
                   />
                   <select name="cacheMemorySizeUnit">
-                    <option value="blocks">Blocks</option>
-                    <option value="words">Words</option>
+                    <option value="blocks" selected="true" disabled="disabled">Blocks</option>
+                    <option value="words" disabled="disabled">Words</option>
                   </select>
                 </div>
                 <h5 id="cacheMemorySizeError" class="error-text">This field is required</h5>
