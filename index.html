@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSARCH2 Cache Simulation</title>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <div class="main-container">
+        <div class="container">
+            <h1>Full-Associative</h1>
+            <h1>First-In-First-Out</h1>
+            <h1 style="margin-bottom: 1rem;">Cache Simulator</h1>
+      
+            <div class="inputs-container">
+			  <div class="input-container">
+				<div class="vertical-container">
+				  <h4>Bits per word:</h4>
+				  <input
+					type="number"
+					id="bitsPerWord"
+					placeholder="Enter number of bits per word"
+					value="32"
+				  />
+				</div>
+				<h5 id="bitsPerWordError" class="error-text">This field is required</h5>
+			  </div>
+			  
+              <div class="input-container">
+                <div class="vertical-container">
+                  <h4>Block Size:</h4>
+                  <input
+                    type="number"
+                    id="blockSize"
+                    placeholder="Enter number of words in a block"
+					value="2"
+					debug
+                  />
+                </div>
+                <h5 id="blockSizeError" class="error-text">This field is required</h5>
+              </div>
+      
+              <div class="input-container">
+                <h4>Main Memory Size:</h4>
+                <div class="horizontal-container">
+                  <input
+                    type="number"
+                    id="mainMemorySize"
+                    placeholder="Enter size"
+					value="64"
+					debug
+                  />
+                  <select name="mainMemorySizeUnit">
+                    <option value="blocks">Blocks</option>
+                    <option value="words">Words</option>
+                  </select>
+                </div>
+                <h5 id="mainMemorySizeError" class="error-text">This field is required</h5>
+              </div>
+      
+              <div class="input-container">
+                <h4>Cache Memory Size:</h4>
+                <div class="horizontal-container">
+                  <input
+                    type="number"
+                    id="cacheMemorySize"
+                    placeholder="Enter size"
+					value="8"
+					debug
+                  />
+                  <select name="cacheMemorySizeUnit">
+                    <option value="blocks">Blocks</option>
+                    <option value="words">Words</option>
+                  </select>
+                </div>
+                <h5 id="cacheMemorySizeError" class="error-text">This field is required</h5>
+              </div>
+      
+              <div class="input-container">
+                <div class="vertical-container">
+                  <h4>Cache Access Time (ns):</h4>
+                  <input
+                    type="number"
+                    id="cacheAccessTime"
+                    placeholder="Enter time (in nanoseconds)"
+					value="1"
+                  />
+                </div>
+                <h5 id="cacheAccessTimeError" class="error-text">This field is required</h5>
+              </div>
+      
+              <div class "input-container">
+                <div class="vertical-container">
+                  <h4>Memory Access Time (ns):</h4>
+                  <input
+                    type="number"
+                    id="memoryAccessTime"
+                    placeholder="Enter time (in nanoseconds)"
+					value="10"
+                  />
+                </div>
+                <h5 id="memoryAccessTimeError" class="error-text">This field is required</h5>
+              </div>
+      
+              <div class="input-container">
+                <h4>Fetch Sequence:</h4>
+                <div class="horizontal-container">
+                  <input
+                    type="text"
+                    id="fetchSequence"
+                    placeholder="Enter sequence (comma-separated in decimal)"
+					value="0,1,2,3,4,0,1,2,4,5,3,7,8,9,10,14,15,11,12,13,2,3,4,0"
+					debug
+                  />
+                  <select name="fetchSequenceUnit">
+                    <option value="blocks">Blocks</option>
+                    <option value="words">Words</option>
+                  </select>
+                </div>
+                <h5 id="fetchSequenceError" class="error-text">This field is required</h5>
+              </div>
+      
+              <div class="input-container">
+                <div class="vertical-container">
+                  <h4>Number of times to be fetched:</h4>
+                  <input
+                    type="number"
+                    id="numFetch"
+                    placeholder="Enter number"
+					value="1"
+                  />
+                </div>
+                <h5 id="numFetchError" class="error-text">This field is required</h5>
+              </div>
+            </div>
+            <div class="horizontal-container">
+              <button id="clear-button">Clear</button>
+              <button id="simulate-button">Simulate</button>
+            </div>
+            <script src="script.js"></script>
+
+        </div>
+
+        <div class="container hide" id="results">
+            <h1>Results</h1>
+
+            <div class="result-container">
+                <h4>Cache Hits:</h4>
+                <h2 id="hits">500</h2>
+            </div>
+            
+            <div class="result-container">
+                <h4>Cache Misses:</h4>
+                <h2 id="misses">500</h2>
+            </div>
+
+            <div class="result-container">
+                <h4>Cache Hit Rate:</h4>
+                <h2 id="hitRate">500</h2>
+            </div>
+            
+            <div class="result-container">
+                <h4>Cache Miss Rate:</h4>
+                <h2 id="missRate">500</h2>
+            </div>
+
+            <div class="result-container">
+                <h4>Memory Access Count:</h4>
+                <h2 id="memoryAccessCount">500</h2>
+            </div>
+
+            <div class="result-container">
+                <h4>Miss Penalty:</h4>
+                <h2 id="missPenalty">500</h2>
+            </div>
+            
+            <div class="result-container">
+                <h4>Average Access Time:</h4>
+                <h2 id="averageAccessTime">500</h2>
+            </div>
+          
+            <div class="result-container">
+                <h4>Total Access Time:</h4>
+                <h2 id="totalAccessTime">500</h2>
+            </div>
+
+            <div id="snapshot">
+
+            </div>
+
+            <button id="download-button">Download</button>
+
+        </div>
+    </div>
+	<div class="main-container">
+		<div class="container hide" id="table-container">
+			<button id="table-step-button">Step</button>
+			<button id="table-reset-button">Reset</button>
+			<button id="table-next-button">Next Block</button>
+			<h2 id="table-hits"></h2>
+			<h2 id="table-misses"></h2>
+			<h2 id="table-desc"></h2>
+			<h2 id="table-averageAccessTime"></h2>
+			<h2 id="table-totalAccessTime"></h2>
+			<table>
+				<thead>
+					<tr>
+						<td>Cache block (dec)</td>
+						<td>Valid (bit)</td>
+						<td>Tag (dec)</td>
+						<td>Data (hex)</td>
+						<td>Address (dec)</td>
+						<td>Access History</td>
+					</tr>
+				</thead>
+				<tbody id="table">
+					
+				</tbody>
+			</table>
+		</div>
+	</div>
+  </body>
+</html>

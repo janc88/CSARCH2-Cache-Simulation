@@ -1,0 +1,132 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400&family=Raleway:wght@200&family=Urbanist:wght@100&display=swap");
+
+body {
+  background-color: black;
+  font-family: "Montserrat", sans-serif;
+}
+
+h1,
+h4,
+h2,
+label,
+table {
+  color: white;
+}
+
+h1 {
+  text-align: center;
+  margin: 0.5rem;
+}
+
+h4,
+h2 {
+  margin-bottom: 0.2rem;
+  margin-top: 0;
+}
+
+.error-text {
+  visibility: hidden;
+  margin-top: 0.3rem;
+  margin-bottom: 0;
+  color: red;
+}
+
+#results {
+}
+
+input,
+select,
+button {
+  border: none;
+  background: none;
+  outline: none;
+  color: white;
+  background-color: #505050;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+button {
+  width: 9rem;
+  padding: 0.8rem;
+  margin-top: 0.5rem;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+#simulate-button {
+  background-color: green;
+}
+
+#clear-button {
+  background-color: gray;
+}
+
+#download-button {
+  background-color: cornflowerblue;
+}
+
+input {
+  min-width: 70%;
+  max-width: 100%;
+}
+
+select {
+  min-width: 5rem;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.main-container {
+  /* position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); */
+  justify-content: center;
+
+  display: flex;
+}
+
+.hide {
+  display: none;
+}
+
+.container {
+  max-height: 90vh;
+  overflow-y: auto;
+
+  border: 0.2rem solid #535353;
+  background-color: #303030;
+  padding: 2rem;
+  border-radius: 1rem;
+  min-width: 23rem;
+  margin: 0 1rem;
+}
+
+.vertical-container,
+.inputs-container,
+.result-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.result-container {
+  margin: 1rem 0;
+}
+
+.inputs-container {
+}
+
+.horizontal-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.input-container {
+  margin: 0.5rem 0;
+}
