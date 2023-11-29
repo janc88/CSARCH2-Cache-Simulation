@@ -16,15 +16,7 @@
       
             <div class="inputs-container">
 			  <div class="input-container">
-				<div class="vertical-container">
-				  <h4>Bits per word:</h4>
-				  <input
-					type="number"
-					id="bitsPerWord"
-					placeholder="Enter number of bits per word"
-					value="32"
-				  />
-				</div>
+			
 				<h5 id="bitsPerWordError" class="error-text">This field is required</h5>
 			  </div>
 			  
@@ -35,7 +27,8 @@
                     type="number"
                     id="blockSize"
                     placeholder="Enter number of words in a block"
-					value="2"
+                    disabled
+					value="32"
 					debug
                   />
                 </div>
@@ -53,8 +46,8 @@
 					debug
                   />
                   <select name="mainMemorySizeUnit">
-                    <option value="blocks">Blocks</option>
-                    <option value="words">Words</option>
+                    <option value="blocks" selected="true" disabled="disabled">Blocks</option>
+                    <option value="words" disabled="disabled">Words</option>
                   </select>
                 </div>
                 <h5 id="mainMemorySizeError" class="error-text">This field is required</h5>
@@ -67,12 +60,13 @@
                     type="number"
                     id="cacheMemorySize"
                     placeholder="Enter size"
-					value="8"
+                    disabled
+					value="16"
 					debug
                   />
                   <select name="cacheMemorySizeUnit">
-                    <option value="blocks">Blocks</option>
-                    <option value="words">Words</option>
+                    <option value="blocks" selected="true" disabled="disabled">Blocks</option>
+                    <option value="words" disabled="disabled">Words</option>
                   </select>
                 </div>
                 <h5 id="cacheMemorySizeError" class="error-text">This field is required</h5>
@@ -104,6 +98,12 @@
                 <h5 id="memoryAccessTimeError" class="error-text">This field is required</h5>
               </div>
       
+              <div class="horizontal-container">
+                <button id="TC1" style="width: 6rem; background-color: rgb(167, 5, 5);">TC#1</button>
+                <button id="TC2" style="width: 6rem; background-color: rgb(167, 5, 5);">TC#2</button>
+                <button id="TC3" style="width: 6rem; background-color: rgb(167, 5, 5);">TC#3</button>
+              </div>
+
               <div class="input-container">
                 <h4>Fetch Sequence:</h4>
                 <div class="horizontal-container">
@@ -115,8 +115,8 @@
 					debug
                   />
                   <select name="fetchSequenceUnit">
-                    <option value="blocks">Blocks</option>
-                    <option value="words">Words</option>
+                    <option value="blocks" selected="true" disabled="disabled">Blocks</option>
+                    <option value="words" disabled="disabled">Words</option>
                   </select>
                 </div>
                 <h5 id="fetchSequenceError" class="error-text">This field is required</h5>
@@ -194,7 +194,7 @@
 
         </div>
     </div>
-	<div class="main-container">
+	<div class="table-container">
 		<div class="container hide" id="table-container">
 			<button id="table-step-button">Step</button>
 			<button id="table-reset-button">Reset</button>

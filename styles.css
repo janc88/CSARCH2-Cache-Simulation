@@ -3,6 +3,33 @@
 body {
   background-color: black;
   font-family: "Montserrat", sans-serif;
+
+  scrollbar-width: thin;
+  scrollbar-color: #535353 #303030;
+
+}
+
+body::-webkit-scrollbar {
+  width: 14px;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: #7c7c7c;
+  border-radius: 6px;
+}
+
+body::-webkit-scrollbar-track {
+  background-color: #303030;
+}
+
+body::-webkit-scrollbar-track-piece:end {
+  background: transparent;
+  margin-bottom: 40px; 
+}
+
+body::-webkit-scrollbar-track-piece:start {
+  background: transparent;
+  margin-top: 20px;
 }
 
 h1,
@@ -44,6 +71,7 @@ button {
   background-color: #505050;
   border-radius: 0.5rem;
   padding: 0.5rem;
+  cursor: pointer;
 }
 
 button {
@@ -87,6 +115,7 @@ input[type="number"]::-webkit-outer-spin-button {
   top: 50%;
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%); */
+  margin: 25px auto;
   justify-content: center;
 
   display: flex;
@@ -97,7 +126,7 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .container {
-  max-height: 90vh;
+  max-height: 80vh;
   overflow-y: auto;
 
   border: 0.2rem solid #535353;
@@ -106,7 +135,34 @@ input[type="number"]::-webkit-outer-spin-button {
   border-radius: 1rem;
   min-width: 23rem;
   margin: 0 1rem;
+
+  scrollbar-width: thin;
+  scrollbar-color: #535353 #303030;
 }
+
+.container::-webkit-scrollbar {
+  width: 12px;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background-color: #7c7c7c;
+  border-radius: 6px;
+}
+
+.container::-webkit-scrollbar-track {
+  background-color: #303030;
+}
+
+.container::-webkit-scrollbar-track-piece:end {
+  background: transparent;
+  margin-bottom: 25px; 
+}
+
+.container::-webkit-scrollbar-track-piece:start {
+  background: transparent;
+  margin-top: 10px;
+}
+
 
 .vertical-container,
 .inputs-container,
@@ -129,4 +185,10 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .input-container {
   margin: 0.5rem 0;
+}
+
+.table-container {
+  width: 1000px;
+  margin: 50px auto;
+  display: block;
 }
