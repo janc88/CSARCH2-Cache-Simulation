@@ -64,17 +64,18 @@ $(document).ready(function () {
   $("#clear-button").click(clearHandler);
 
   function getValues() {
-	bitsPerWord = showErrorIfBlank($("#bitsPerWord"), $("#bitsPerWordError"));
-	bitsPerWord = parseInt(bitsPerWord);
-	if (isNaN(bitsPerWord))
-		bitsPerWord = null;
-	else if (bitsPerWord <= 0) {
-		showError($("#bitsPerWordError"), "Bits per word must be greater than 0");
-		bitsPerWord = null;
-	} else if (Math.log2(bitsPerWord) % 1 !== 0) {
-		showError($("#bitsPerWordError"), "Bits per word must be a power of 2");
-		bitsPerWord = null;
-	}
+	  bitsPerWord = 32;
+	// bitsPerWord = showErrorIfBlank($("#bitsPerWord"), $("#bitsPerWordError"));
+	// bitsPerWord = parseInt(bitsPerWord);
+	// if (isNaN(bitsPerWord))
+	// 	bitsPerWord = null;
+	// else if (bitsPerWord <= 0) {
+	// 	showError($("#bitsPerWordError"), "Bits per word must be greater than 0");
+	// 	bitsPerWord = null;
+	// } else if (Math.log2(bitsPerWord) % 1 !== 0) {
+	// 	showError($("#bitsPerWordError"), "Bits per word must be a power of 2");
+	// 	bitsPerWord = null;
+	// }
 
     blockSize = showErrorIfBlank($("#blockSize"), $("#blockSizeError"));
 	blockSize = parseInt(blockSize);
