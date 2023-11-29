@@ -376,7 +376,7 @@ function generateAccessSequence() {
 		operations.push(() => {
 			tableState.desc = `Accessing word ${wordAddress} from main memory block ${mmBlockAddress} (cache ${cacheAddress}); total access time + cache access time + memory access time`
 			tableState.totalAccessTime += cacheTime + memoryTime;
-			arr.accessHistory.push(wordAddress);
+			arr.accessHistory[i].push(wordAddress);
 			arr.data[i] = bitStringToHex(data);
 			arr.address[i] = wordAddress;
 		});
