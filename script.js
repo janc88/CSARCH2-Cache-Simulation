@@ -1,9 +1,9 @@
 var snapshots = [];
 var cacheBlocks;
-var blockSize;
+var blockSize = 32;
 var mainMemoryBlocks;
 var mainMemorySizeUnit;
-var cacheBlocks;
+var cacheBlocks = 16;
 var cacheMemorySizeUnit;
 var cacheAccessTime;
 var memoryAccessTime;
@@ -193,6 +193,39 @@ $(document).ready(function () {
 		numFetch !== null
 	)
   }
+
+  $("#TC1").click(()=>{
+	fetchSequence = "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31"
+	numFetch = 4
+	$("#fetchSequence").val(fetchSequence)
+	$("#numFetch").val(numFetch)
+  })
+
+  function generateRandomNumbers(n, min, max) {
+    const numbers = [];
+    for (let i = 0; i < n; i++) {
+        const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+        numbers.push(randomNumber);
+    }
+    const result = numbers.join(',');
+	console.log(numbers)
+    return result;
+}
+
+  $("#TC2").click(()=>{
+	fetchSequence = generateRandomNumbers(4*cacheBlocks, 1, 10)
+	numFetch = 1
+	$("#fetchSequence").val(fetchSequence)
+	$("#numFetch").val(numFetch)
+  })
+
+  $("#TC3").click(()=>{
+	fetchSequence = "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31"
+	numFetch = 4
+	$("#fetchSequence").val(fetchSequence)
+	$("#numFetch").val(numFetch)
+  })
+
   $("#simulate-button").click(function () {
     $("#snapshot").empty();
 	if (!getValues()) return;
