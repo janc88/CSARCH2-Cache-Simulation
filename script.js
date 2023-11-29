@@ -213,7 +213,8 @@ $(document).ready(function () {
 }
 
   $("#TC2").click(()=>{
-	fetchSequence = generateRandomNumbers(4*cacheBlocks, 1, 10)
+	mainMemoryBlocks = $("#mainMemorySize").val()
+	fetchSequence = generateRandomNumbers(4*cacheBlocks, 1, mainMemoryBlocks)
 	numFetch = 1
 	$("#fetchSequence").val(fetchSequence)
 	$("#numFetch").val(numFetch)
